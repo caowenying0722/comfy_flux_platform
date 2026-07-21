@@ -180,6 +180,34 @@ ComfyUI/user/default/workflows/image_flux2_fp8.json
 
 确认单张图能跑通后，导出 API 格式 workflow，放到本项目 `workflows/` 下。后端只要求 workflow 是 ComfyUI `/prompt` 接口能接受的 API JSON。
 
+## 4.2 旧驱动兼容模式：能生图的 SD1.5 路线
+
+如果宿主机 NVIDIA 驱动是 `470.x`，无法稳定运行当前 ComfyUI + Flux/Flux2 所需的新 PyTorch。此时使用旧版 ComfyUI + PyTorch CUDA 11.3：
+
+```bash
+cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
+./scripts/install_comfyui_cuda114_legacy.sh
+./scripts/download_sd15_legacy.sh
+```
+
+启动 ComfyUI：
+
+```bash
+./scripts/start_comfyui.sh
+```
+
+后端使用：
+
+```json
+{"style_id":"sd15_legacy"}
+```
+
+已知限制：
+
+- `flux_schnell` FP8 在旧 torch 下无法加载，错误为缺少 `torch.float8_e4m3fn`。
+- 最新 ComfyUI 在旧 torch 下无法启动，错误为缺少 `torch.library.custom_op`。
+- 因此旧驱动下的可落地路线是 SD1.5/部分旧 SDXL 工作流，不是 Flux/Flux2。
+
 后端 `.env`：
 
 ```env

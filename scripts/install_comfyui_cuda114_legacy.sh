@@ -14,6 +14,19 @@ if [ ! -x miniconda/bin/python ]; then
   bash /tmp/miniconda_py310.sh -b -p "$PWD/miniconda"
 fi
 
+if [ ! -f ComfyUI/main.py ]; then
+  mkdir -p ComfyUI
+  tmp_dir="$(mktemp -d)"
+  git clone https://github.com/comfyanonymous/ComfyUI.git "$tmp_dir/ComfyUI"
+  cp -a "$tmp_dir/ComfyUI/." ComfyUI/
+  rm -rf "$tmp_dir"
+fi
+
+cd ComfyUI
+git fetch --depth 1 origin tag v0.3.20
+git checkout -f v0.3.20
+cd ..
+
 miniconda/bin/python -m pip install -U pip setuptools wheel
 miniconda/bin/python -m pip install "numpy>=1.25,<2"
 miniconda/bin/python -m pip install \
@@ -25,5 +38,7 @@ miniconda/bin/python -m pip install \
 if command -v patchelf >/dev/null 2>&1; then
   patchelf --clear-execstack miniconda/lib/python3.10/site-packages/torch/lib/libtorch_cpu.so || true
 fi
+
+./scripts/patch_comfyui_torch112.sh
 
 ./scripts/diagnose_gpu_runtime.sh

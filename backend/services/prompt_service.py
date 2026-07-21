@@ -58,6 +58,13 @@ DEFAULT_STYLES = [
         "negative_prompt": "",
         "workflow_json": "flux_schnell_img2img.json",
     },
+    {
+        "id": "sd15_legacy",
+        "name": "SD1.5 兼容生图",
+        "prompt": "high quality, detailed, professional photography, clean composition",
+        "negative_prompt": "low quality, blurry, distorted, watermark, text, bad anatomy",
+        "workflow_json": "sd15_img2img.json",
+    },
 ]
 
 
