@@ -91,6 +91,31 @@ curl -X POST http://127.0.0.1:8000/generate \
 
 `count` 支持 1-20，可覆盖 5、10、20 张批量生成场景。每张图自动使用不同 seed，失败会按 `.env` 的 `GENERATION_MAX_RETRIES` 重试。
 
+### 批量上传与批量生成
+
+一次上传多张图片：
+
+```bash
+curl -X POST http://127.0.0.1:8000/upload/batch \
+  -F "files=@/path/to/1.jpg" \
+  -F "files=@/path/to/2.jpg" \
+  -F "files=@/path/to/3.jpg"
+```
+
+对多张图片批量生成同一风格：
+
+```bash
+curl -X POST http://127.0.0.1:8000/generate/batch \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_ids": ["image-id-1", "image-id-2"],
+    "style_id": "dreamshaper_pixar",
+    "count": 1
+  }'
+```
+
+返回的是多个任务 ID。每个任务仍使用 `/task/{task_id}` 查询。后端会串行处理任务，避免多张图同时占满显存。
+
 ### 查询任务
 
 ```bash

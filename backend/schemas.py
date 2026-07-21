@@ -8,6 +8,10 @@ class UploadResponse(BaseModel):
     filename: str
 
 
+class BatchUploadResponse(BaseModel):
+    images: list[UploadResponse]
+
+
 class GenerateRequest(BaseModel):
     image_id: str
     style_id: str
@@ -17,6 +21,22 @@ class GenerateRequest(BaseModel):
 class GenerateResponse(BaseModel):
     task_id: str
     status: str
+
+
+class BatchGenerateRequest(BaseModel):
+    image_ids: list[str] = Field(min_length=1, max_length=20)
+    style_id: str
+    count: int = Field(default=1, ge=1, le=20)
+
+
+class BatchGenerateItem(BaseModel):
+    image_id: str
+    task_id: str
+    status: str
+
+
+class BatchGenerateResponse(BaseModel):
+    tasks: list[BatchGenerateItem]
 
 
 class TaskImage(BaseModel):

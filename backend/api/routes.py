@@ -3,7 +3,18 @@ from sqlalchemy.orm import Session
 
 from backend.database.session import get_db
 from backend.models.entities import GenerationTask, UploadedImage
-from backend.schemas import GenerateRequest, GenerateResponse, StyleResponse, TaskImage, TaskResponse, UploadResponse
+from backend.schemas import (
+    BatchGenerateItem,
+    BatchGenerateRequest,
+    BatchGenerateResponse,
+    BatchUploadResponse,
+    GenerateRequest,
+    GenerateResponse,
+    StyleResponse,
+    TaskImage,
+    TaskResponse,
+    UploadResponse,
+)
 from backend.services.prompt_service import PromptService
 from backend.services.storage import StorageService
 from backend.services.task_service import TaskService
@@ -26,6 +37,25 @@ async def upload_image(file: UploadFile = File(...), db: Session = Depends(get_d
     return UploadResponse(image_id=image_id, filename=row.filename)
 
 
+@router.post("/upload/batch", response_model=BatchUploadResponse)
+async def upload_images(files: list[UploadFile] = File(...), db: Session = Depends(get_db)):
+    if not files:
+        raise HTTPException(status_code=400, detail="No files uploaded")
+    if len(files) > 20:
+        raise HTTPException(status_code=400, detail="At most 20 images can be uploaded at once")
+
+    results: list[UploadResponse] = []
+    for file in files:
+        if not file.content_type or not file.content_type.startswith("image/"):
+            raise HTTPException(status_code=400, detail=f"Only image uploads are supported: {file.filename}")
+        image_id, path = await storage.save_upload(file)
+        row = UploadedImage(id=image_id, filename=file.filename or path.name, path=str(path), content_type=file.content_type)
+        db.add(row)
+        results.append(UploadResponse(image_id=image_id, filename=row.filename))
+    db.commit()
+    return BatchUploadResponse(images=results)
+
+
 @router.post("/generate", response_model=GenerateResponse)
 def generate(req: GenerateRequest, db: Session = Depends(get_db)):
     try:
@@ -33,6 +63,18 @@ def generate(req: GenerateRequest, db: Session = Depends(get_db)):
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return GenerateResponse(task_id=task.id, status=task.status)
+
+
+@router.post("/generate/batch", response_model=BatchGenerateResponse)
+def generate_batch(req: BatchGenerateRequest, db: Session = Depends(get_db)):
+    tasks: list[BatchGenerateItem] = []
+    for image_id in req.image_ids:
+        try:
+            task = task_service.create_task(db, image_id=image_id, style_id=req.style_id, count=req.count)
+        except ValueError as exc:
+            raise HTTPException(status_code=404, detail=f"{image_id}: {exc}") from exc
+        tasks.append(BatchGenerateItem(image_id=image_id, task_id=task.id, status=task.status))
+    return BatchGenerateResponse(tasks=tasks)
 
 
 @router.get("/task/{task_id}", response_model=TaskResponse)
