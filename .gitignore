@@ -1,4 +1,5 @@
 .venv/
+miniconda/
 ComfyUI/
 data/
 storage/
