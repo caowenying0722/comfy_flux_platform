@@ -1,0 +1,104 @@
+{
+  "_meta": {
+    "name": "pixar-controlnet-canny-img2img",
+    "note": "DreamShaper XL Lightning + SDXL Canny ControlNet img2img workflow. Uses fixed 3:2 landscape resolution."
+  },
+  "1": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "DreamShaperXL_Lightning.safetensors"
+    }
+  },
+  "2": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "{{input_image}}"
+    }
+  },
+  "3": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": ["2", 0],
+      "upscale_method": "lanczos",
+      "width": 1152,
+      "height": 768,
+      "crop": "center"
+    }
+  },
+  "4": {
+    "class_type": "Canny",
+    "inputs": {
+      "image": ["3", 0],
+      "low_threshold": 0.25,
+      "high_threshold": 0.75
+    }
+  },
+  "5": {
+    "class_type": "ControlNetLoader",
+    "inputs": {
+      "control_net_name": "controlnet-canny-sdxl-1.0-small.safetensors"
+    }
+  },
+  "6": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": ["3", 0],
+      "vae": ["1", 2]
+    }
+  },
+  "7": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "{{prompt}}",
+      "clip": ["1", 1]
+    }
+  },
+  "8": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "text": "{{negative_prompt}}",
+      "clip": ["1", 1]
+    }
+  },
+  "9": {
+    "class_type": "ControlNetApplyAdvanced",
+    "inputs": {
+      "positive": ["7", 0],
+      "negative": ["8", 0],
+      "control_net": ["5", 0],
+      "image": ["4", 0],
+      "strength": 0.75,
+      "start_percent": 0.0,
+      "end_percent": 0.8
+    }
+  },
+  "10": {
+    "class_type": "KSampler",
+    "inputs": {
+      "seed": "{{seed}}",
+      "steps": 8,
+      "cfg": 2.0,
+      "sampler_name": "dpmpp_sde",
+      "scheduler": "karras",
+      "denoise": 0.58,
+      "model": ["1", 0],
+      "positive": ["9", 0],
+      "negative": ["9", 1],
+      "latent_image": ["6", 0]
+    }
+  },
+  "11": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["10", 0],
+      "vae": ["1", 2]
+    }
+  },
+  "12": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "comfy_flux_platform/pixar_controlnet",
+      "images": ["11", 0]
+    }
+  }
+}

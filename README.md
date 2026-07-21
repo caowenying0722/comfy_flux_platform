@@ -166,6 +166,7 @@ python main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch
 | --- | --- | --- |
 | SDXL base | 已下载并通过后端 E2E 测试 | 旧版 ComfyUI + PyTorch 1.12 可加载 checkpoint 工作流 |
 | DreamShaper XL Lightning | 已下载并通过后端 E2E 测试 | SDXL 微调 checkpoint，风格化能力强于 SDXL base |
+| DreamShaper XL + Canny ControlNet | 已下载并通过后端 E2E 测试 | 更好保持轮廓、构图和背景结构 |
 | SD1.5 | 已下载并通过后端 E2E 测试 | 对旧驱动兼容性最好 |
 | Flux/Flux2/FLUX.1-schnell FP8 | 不保留 | 旧 torch 缺少 `torch.float8_e4m3fn` |
 | Qwen-Image | 不下载 | 20B 级别新模型，对新 ComfyUI/torch/显存/内存要求高，当前环境不能保证通过 |
@@ -268,6 +269,51 @@ ComfyUI/models/checkpoints/DreamShaperXL_Lightning.safetensors
 ```text
 workflows/dreamshaper_xl_img2img.json
 ```
+
+## 4.5 ControlNet 皮克斯图生图路线
+
+该路线使用 DreamShaper XL Lightning + SDXL Canny ControlNet，用 Canny 边缘约束画面结构，目标是比纯 img2img 更稳定地保持人物轮廓、人数、构图和背景结构。
+
+安装 aux 节点与下载 ControlNet：
+
+```bash
+cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
+./scripts/install_controlnet_aux.sh
+./scripts/download_controlnet_canny_sdxl.sh
+./scripts/install_workflows_to_comfyui.sh
+```
+
+模型位置：
+
+```text
+ComfyUI/models/controlnet/controlnet-canny-sdxl-1.0-small.safetensors
+```
+
+后端使用：
+
+```json
+{"style_id":"pixar_controlnet"}
+```
+
+ComfyUI 可编辑 workflow：
+
+```text
+ComfyUI/user/default/workflows/pixar_controlnet_img2img_ui.json
+```
+
+默认参数：
+
+```text
+checkpoint: DreamShaperXL_Lightning.safetensors
+resolution: 1152x768
+controlnet strength: 0.75
+controlnet end_percent: 0.8
+steps: 8
+cfg: 2.0
+denoise: 0.58
+```
+
+如果背景变化仍明显，降低 `denoise` 到 `0.45-0.52`，或把 `controlnet strength` 提高到 `0.85-1.0`。如果皮克斯风格不够强，提高 `denoise` 到 `0.65-0.70`，但人物一致性会下降。
 
 后端 `.env`：
 

@@ -72,6 +72,13 @@ DEFAULT_STYLES = [
         "negative_prompt": "extra person, missing person, wrong number of people, changed background, new background, different scene, added objects, removed objects, changed clothing, changed pose, changed hairstyle, changed face identity, duplicate person, cropped person, out of frame, photorealistic, realistic photo, anime, manga, 2d illustration, oil painting, watercolor, sketch, text, watermark, logo, low quality, blurry, distorted face, deformed body, bad anatomy, bad hands, extra fingers, missing fingers",
         "workflow_json": "dreamshaper_xl_img2img.json",
     },
+    {
+        "id": "pixar_controlnet",
+        "name": "ControlNet 3D皮克斯风",
+        "prompt": "3D Pixar-style animated movie still, stylized 3D cartoon character, cute and expressive face, large friendly eyes, rounded facial features, soft smooth materials, warm cinematic lighting, colorful but natural, high quality 3D animation render, preserve the same person or people, preserve the correct number of people, preserve hairstyle, clothing, pose and body position, keep the original background unchanged, keep the original composition, horizontal 3:2 image",
+        "negative_prompt": "extra person, missing person, wrong number of people, duplicate person, changed background, new background, different scene, added objects, removed objects, changed clothing, changed pose, changed hairstyle, changed face identity, cropped person, out of frame, photorealistic, realistic photo, anime, manga, 2d illustration, sketch, oil painting, watercolor, text, watermark, logo, low quality, blurry, distorted face, deformed body, bad anatomy, bad hands, extra fingers, missing fingers",
+        "workflow_json": "pixar_controlnet_img2img.json",
+    },
 ]
 
 DEPRECATED_STYLE_IDS = {"flux_schnell"}
