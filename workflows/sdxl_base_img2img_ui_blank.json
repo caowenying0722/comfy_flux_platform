@@ -86,9 +86,7 @@
       ],
       "title": "Positive Prompt",
       "properties": {"Node name for S&R": "CLIPTextEncode"},
-      "widgets_values": [
-        "type your positive prompt here, for example: lively anime comic illustration, clean bold line art, cel shading, vibrant colors, expressive character, non-photorealistic, 2d illustration"
-      ]
+      "widgets_values": [""]
     },
     {
       "id": 5,
@@ -106,9 +104,7 @@
       ],
       "title": "Negative Prompt",
       "properties": {"Node name for S&R": "CLIPTextEncode"},
-      "widgets_values": [
-        "type your negative prompt here, for example: photorealistic, realistic photo, makeup, beauty retouching, skin smoothing, photography, text, watermark, logo, low quality, blurry, bad anatomy"
-      ]
+      "widgets_values": [""]
     },
     {
       "id": 6,
@@ -128,7 +124,7 @@
         {"name": "LATENT", "type": "LATENT", "links": [11], "slot_index": 0}
       ],
       "properties": {"Node name for S&R": "KSampler"},
-      "widgets_values": [1727053683, "randomize", 24, 6.5, "dpmpp_2m", "karras", 0.55]
+      "widgets_values": [1727053683, "randomize", 24, 6.5, "dpmpp_2m", "karras", 0.65]
     },
     {
       "id": 7,
@@ -161,7 +157,7 @@
       ],
       "outputs": [],
       "properties": {"Node name for S&R": "SaveImage"},
-      "widgets_values": ["comfy_flux_platform/sdxl_ui"]
+      "widgets_values": ["comfy_flux_platform/sdxl_ui_blank"]
     }
   ],
   "links": [
