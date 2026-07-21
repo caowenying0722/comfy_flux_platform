@@ -3,8 +3,12 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-if [ ! -d ComfyUI ]; then
-  git clone https://github.com/comfyanonymous/ComfyUI.git ComfyUI
+if [ ! -f ComfyUI/main.py ]; then
+  mkdir -p ComfyUI
+  tmp_dir="$(mktemp -d)"
+  git clone https://github.com/comfyanonymous/ComfyUI.git "$tmp_dir/ComfyUI"
+  cp -a "$tmp_dir/ComfyUI/." ComfyUI/
+  rm -rf "$tmp_dir"
 fi
 
 cd ComfyUI

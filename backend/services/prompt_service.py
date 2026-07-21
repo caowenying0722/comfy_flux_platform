@@ -51,6 +51,13 @@ DEFAULT_STYLES = [
         "negative_prompt": "low quality, blurry, flat colors, watermark, text",
         "workflow_json": "oilpainting.json",
     },
+    {
+        "id": "flux_schnell",
+        "name": "FLUX.1 Schnell",
+        "prompt": "high quality image, detailed, clean composition, cinematic lighting",
+        "negative_prompt": "",
+        "workflow_json": "flux_schnell_img2img.json",
+    },
 ]
 
 
