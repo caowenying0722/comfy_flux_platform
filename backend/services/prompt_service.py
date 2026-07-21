@@ -12,44 +12,44 @@ DEFAULT_STYLES = [
     {
         "id": "cinematic",
         "name": "电影写真",
-        "prompt": "cinematic portrait, professional photography, dramatic lighting, ultra detailed, natural skin texture",
-        "negative_prompt": "low quality, blurry, distorted, extra fingers, bad anatomy, watermark",
-        "workflow_json": "cinematic.json",
+        "prompt": "cinematic portrait, professional photography, dramatic lighting, shallow depth of field, natural skin texture, high detail, film still, tasteful color grading",
+        "negative_prompt": "low quality, worst quality, blurry, jpeg artifacts, watermark, text, logo, deformed, bad anatomy, bad hands, distorted face",
+        "workflow_json": "sdxl_base_img2img.json",
     },
     {
         "id": "product",
         "name": "商业摄影",
-        "prompt": "premium commercial photography, clean studio lighting, sharp details, elegant composition, high-end advertising",
-        "negative_prompt": "low quality, cluttered background, blurry, watermark, text",
-        "workflow_json": "product.json",
+        "prompt": "premium commercial photography, clean studio lighting, sharp details, elegant composition, high-end advertising, polished surface, realistic shadows",
+        "negative_prompt": "low quality, worst quality, cluttered background, blurry, jpeg artifacts, watermark, text, logo, distorted object",
+        "workflow_json": "sdxl_base_img2img.json",
     },
     {
         "id": "anime",
         "name": "动漫风",
-        "prompt": "anime style illustration, clean line art, vibrant colors, expressive eyes, detailed background",
-        "negative_prompt": "low quality, blurry, deformed, extra limbs, watermark",
-        "workflow_json": "anime.json",
+        "prompt": "anime style illustration, clean line art, vibrant colors, expressive eyes, detailed background, polished digital art, beautiful lighting",
+        "negative_prompt": "low quality, worst quality, blurry, jpeg artifacts, watermark, text, logo, deformed, extra limbs, bad hands",
+        "workflow_json": "sdxl_base_img2img.json",
     },
     {
         "id": "figurine3d",
         "name": "3D手办",
-        "prompt": "3D collectible figurine, toy photography, premium resin material, detailed sculpt, studio lighting",
-        "negative_prompt": "low quality, blurry, broken model, watermark, text",
-        "workflow_json": "figurine3d.json",
+        "prompt": "3D collectible figurine, toy photography, premium resin material, detailed sculpt, studio lighting, miniature diorama, smooth high quality render",
+        "negative_prompt": "low quality, worst quality, blurry, jpeg artifacts, watermark, text, logo, broken model, malformed body",
+        "workflow_json": "sdxl_base_img2img.json",
     },
     {
         "id": "guofeng",
         "name": "国风艺术",
-        "prompt": "traditional Chinese art style, elegant guofeng aesthetics, ink wash details, refined composition",
-        "negative_prompt": "low quality, blurry, messy, watermark, text",
-        "workflow_json": "guofeng.json",
+        "prompt": "traditional Chinese art style, elegant guofeng aesthetics, ink wash details, refined composition, soft silk texture, poetic atmosphere",
+        "negative_prompt": "low quality, worst quality, blurry, jpeg artifacts, watermark, text, logo, messy composition, distorted face",
+        "workflow_json": "sdxl_base_img2img.json",
     },
     {
         "id": "oilpainting",
         "name": "油画风",
-        "prompt": "oil painting portrait, rich brush strokes, museum quality, dramatic lighting, detailed texture",
-        "negative_prompt": "low quality, blurry, flat colors, watermark, text",
-        "workflow_json": "oilpainting.json",
+        "prompt": "oil painting portrait, rich brush strokes, museum quality, dramatic lighting, detailed canvas texture, classical composition",
+        "negative_prompt": "low quality, worst quality, blurry, jpeg artifacts, watermark, text, logo, flat colors, distorted anatomy",
+        "workflow_json": "sdxl_base_img2img.json",
     },
     {
         "id": "sd15_legacy",
@@ -80,7 +80,13 @@ class PromptService:
             if style:
                 db.delete(style)
         for item in DEFAULT_STYLES:
-            if not db.get(StyleTemplate, item["id"]):
+            style = db.get(StyleTemplate, item["id"])
+            if style:
+                style.name = item["name"]
+                style.prompt = item["prompt"]
+                style.negative_prompt = item["negative_prompt"]
+                style.workflow_json = item["workflow_json"]
+            else:
                 db.add(StyleTemplate(**item))
         db.commit()
 

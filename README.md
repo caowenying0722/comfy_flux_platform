@@ -196,6 +196,26 @@ cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
 ComfyUI/models/checkpoints/sd_xl_base_1.0.safetensors
 ```
 
+最小可用自动图生图 workflow：
+
+```text
+LoadImage
+→ ImageScale(1024x1024)
+→ CheckpointLoaderSimple(sd_xl_base_1.0.safetensors)
+→ VAEEncode
+→ CLIPTextEncode(prompt / negative_prompt)
+→ KSampler(img2img denoise 0.55)
+→ VAEDecode
+→ SaveImage
+```
+
+说明：
+
+- `sd_xl_base_1.0.safetensors` 是完整 SDXL checkpoint，`CheckpointLoaderSimple` 会直接输出 `MODEL / CLIP / VAE`。
+- 因此当前最小可用工作流不需要额外下载 CLIP 或 VAE。
+- 只有使用分体模型、替换精调 VAE、或切换到 Flux/Qwen/Z-Image 这类新架构时，才需要额外的 text encoder / VAE / diffusion model。
+- 当前 `cinematic/product/anime/figurine3d/guofeng/oilpainting/sdxl_base` 风格均复用 `workflows/sdxl_base_img2img.json`，通过不同 prompt 区分风格。
+
 后端 `.env`：
 
 ```env
@@ -231,7 +251,6 @@ ComfyUI/models/
 
 ```text
 ComfyUI/models/checkpoints/sd_xl_base_1.0.safetensors
-ComfyUI/models/upscale_models/4x-UltraSharp.pth
 ```
 
 如果使用 Flux2，需要在 ComfyUI 中确认已安装对应节点、模型文件和 text encoder，然后从 ComfyUI 导出 API 格式 workflow，保存到 `workflows/*.json`，保留这些占位符：

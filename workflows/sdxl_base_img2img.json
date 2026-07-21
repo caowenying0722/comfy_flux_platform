@@ -18,7 +18,7 @@
   "3": {
     "class_type": "VAEEncode",
     "inputs": {
-      "pixels": ["2", 0],
+      "pixels": ["9", 0],
       "vae": ["1", 2]
     }
   },
@@ -63,6 +63,16 @@
     "inputs": {
       "filename_prefix": "comfy_flux_platform/sdxl_base",
       "images": ["7", 0]
+    }
+  },
+  "9": {
+    "class_type": "ImageScale",
+    "inputs": {
+      "image": ["2", 0],
+      "upscale_method": "lanczos",
+      "width": "{{width}}",
+      "height": "{{height}}",
+      "crop": "center"
     }
   }
 }
