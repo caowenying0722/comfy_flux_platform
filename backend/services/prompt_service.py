@@ -65,6 +65,13 @@ DEFAULT_STYLES = [
         "negative_prompt": "low quality, worst quality, blurry, jpeg artifacts, watermark, text, logo, deformed, bad anatomy, bad hands, distorted face",
         "workflow_json": "sdxl_base_img2img.json",
     },
+    {
+        "id": "dreamshaper_pixar",
+        "name": "DreamShaper 3D皮克斯风",
+        "prompt": "3D Pixar-style character rendering, stylized 3D animated movie look, keep the exact same person or people from the reference image, preserve the correct number of people, preserve each person's identity, face structure, hairstyle, clothing, pose, body shape and position, keep the original background unchanged, keep the original composition, clean high quality 3D animation style, soft lighting, smooth materials, expressive but natural faces, only stylize the people into 3D animated characters",
+        "negative_prompt": "extra person, missing person, wrong number of people, changed background, new background, different scene, added objects, removed objects, changed clothing, changed pose, changed hairstyle, changed face identity, duplicate person, cropped person, out of frame, photorealistic, realistic photo, anime, manga, 2d illustration, oil painting, watercolor, sketch, text, watermark, logo, low quality, blurry, distorted face, deformed body, bad anatomy, bad hands, extra fingers, missing fingers",
+        "workflow_json": "dreamshaper_xl_img2img.json",
+    },
 ]
 
 DEPRECATED_STYLE_IDS = {"flux_schnell"}

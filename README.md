@@ -140,6 +140,7 @@ python main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch
 | 模型路线 | 当前状态 | 原因 |
 | --- | --- | --- |
 | SDXL base | 已下载并通过后端 E2E 测试 | 旧版 ComfyUI + PyTorch 1.12 可加载 checkpoint 工作流 |
+| DreamShaper XL Lightning | 已下载并通过后端 E2E 测试 | SDXL 微调 checkpoint，风格化能力强于 SDXL base |
 | SD1.5 | 已下载并通过后端 E2E 测试 | 对旧驱动兼容性最好 |
 | Flux/Flux2/FLUX.1-schnell FP8 | 不保留 | 旧 torch 缺少 `torch.float8_e4m3fn` |
 | Qwen-Image | 不下载 | 20B 级别新模型，对新 ComfyUI/torch/显存/内存要求高，当前环境不能保证通过 |
@@ -215,6 +216,33 @@ LoadImage
 - 因此当前最小可用工作流不需要额外下载 CLIP 或 VAE。
 - 只有使用分体模型、替换精调 VAE、或切换到 Flux/Qwen/Z-Image 这类新架构时，才需要额外的 text encoder / VAE / diffusion model。
 - 当前 `cinematic/product/anime/figurine3d/guofeng/oilpainting/sdxl_base` 风格均复用 `workflows/sdxl_base_img2img.json`，通过不同 prompt 区分风格。
+
+## 4.4 DreamShaper XL 风格化路线
+
+DreamShaper XL Lightning 是基于 SDXL Base 微调的 checkpoint，更偏艺术、动漫和风格化，当前旧驱动环境已验证可运行：
+
+```bash
+cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
+./scripts/download_dreamshaper_xl.sh
+```
+
+模型位置：
+
+```text
+ComfyUI/models/checkpoints/DreamShaperXL_Lightning.safetensors
+```
+
+后端使用：
+
+```json
+{"style_id":"dreamshaper_pixar"}
+```
+
+对应 workflow：
+
+```text
+workflows/dreamshaper_xl_img2img.json
+```
 
 后端 `.env`：
 
