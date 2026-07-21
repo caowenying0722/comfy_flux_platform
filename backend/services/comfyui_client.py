@@ -77,9 +77,13 @@ class ComfyUIClient:
         deadline = time.time() + timeout_seconds
         ws = websocket.WebSocket()
         ws.connect(f"{self.ws_url}?clientId={client_id}", timeout=10)
+        ws.settimeout(120)
         try:
             while time.time() < deadline:
-                message = ws.recv()
+                try:
+                    message = ws.recv()
+                except websocket.WebSocketTimeoutException:
+                    continue
                 if isinstance(message, bytes):
                     continue
                 payload = json.loads(message)

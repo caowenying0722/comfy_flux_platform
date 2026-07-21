@@ -52,20 +52,22 @@ DEFAULT_STYLES = [
         "workflow_json": "oilpainting.json",
     },
     {
-        "id": "flux_schnell",
-        "name": "FLUX.1 Schnell",
-        "prompt": "high quality image, detailed, clean composition, cinematic lighting",
-        "negative_prompt": "",
-        "workflow_json": "flux_schnell_img2img.json",
-    },
-    {
         "id": "sd15_legacy",
         "name": "SD1.5 兼容生图",
         "prompt": "high quality, detailed, professional photography, clean composition",
         "negative_prompt": "low quality, blurry, distorted, watermark, text, bad anatomy",
         "workflow_json": "sd15_img2img.json",
     },
+    {
+        "id": "sdxl_base",
+        "name": "SDXL 高质量兼容",
+        "prompt": "masterpiece, best quality, high quality, ultra detailed, professional photography, cinematic lighting, sharp focus, rich detail, elegant composition",
+        "negative_prompt": "low quality, worst quality, blurry, jpeg artifacts, watermark, text, logo, deformed, bad anatomy, bad hands, distorted face",
+        "workflow_json": "sdxl_base_img2img.json",
+    },
 ]
+
+DEPRECATED_STYLE_IDS = {"flux_schnell"}
 
 
 class PromptService:
@@ -73,6 +75,10 @@ class PromptService:
         self.settings = get_settings()
 
     def seed_defaults(self, db: Session) -> None:
+        for style_id in DEPRECATED_STYLE_IDS:
+            style = db.get(StyleTemplate, style_id)
+            if style:
+                db.delete(style)
         for item in DEFAULT_STYLES:
             if not db.get(StyleTemplate, item["id"]):
                 db.add(StyleTemplate(**item))

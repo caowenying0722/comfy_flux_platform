@@ -133,52 +133,19 @@ source .venv/bin/activate
 python main.py --listen 0.0.0.0 --port 8188 --disable-auto-launch
 ```
 
-## 4.1 Flux2 Dev FP8 下载与加载
+## 4.1 当前服务器模型兼容性结论
 
-Flux2 推荐先使用 FP8 版本在 RTX 3090 24GB 上验证。执行：
+当前宿主机 NVIDIA 驱动为 `470.x`，无法稳定运行当前 Flux/Flux2/Qwen-Image/Z-Image 常用的新 PyTorch + 新 ComfyUI 栈。已验证的可用路线如下：
 
-```bash
-cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
-./scripts/install_comfyui.sh
-./scripts/download_flux2_models.sh flux2-dev-fp8
-```
+| 模型路线 | 当前状态 | 原因 |
+| --- | --- | --- |
+| SDXL base | 已下载并通过后端 E2E 测试 | 旧版 ComfyUI + PyTorch 1.12 可加载 checkpoint 工作流 |
+| SD1.5 | 已下载并通过后端 E2E 测试 | 对旧驱动兼容性最好 |
+| Flux/Flux2/FLUX.1-schnell FP8 | 不保留 | 旧 torch 缺少 `torch.float8_e4m3fn` |
+| Qwen-Image | 不下载 | 20B 级别新模型，对新 ComfyUI/torch/显存/内存要求高，当前环境不能保证通过 |
+| Z-Image | 不下载 | 主流高效运行路径依赖 FP8/Triton/新 torch，当前环境不能保证通过 |
 
-脚本默认要求目标盘至少有 50GB 空闲空间，避免大模型下载过程中把磁盘写满。确认为安全后可降低阈值：
-
-```bash
-MIN_FREE_GB=35 ./scripts/download_flux2_models.sh flux2-dev-fp8
-```
-
-脚本会下载到独立 ComfyUI 目录：
-
-```text
-ComfyUI/models/text_encoders/mistral_3_small_flux2_fp8.safetensors
-ComfyUI/models/diffusion_models/flux2_dev_fp8mixed.safetensors
-ComfyUI/models/vae/flux2-vae.safetensors
-ComfyUI/models/loras/Flux2TurboComfyv2.safetensors
-ComfyUI/user/default/workflows/image_flux2_fp8.json
-```
-
-如果 Hugging Face 要求登录或授权：
-
-```bash
-export HF_TOKEN=你的HuggingFaceToken
-./scripts/download_flux2_models.sh flux2-dev-fp8
-```
-
-启动 ComfyUI：
-
-```bash
-./scripts/start_comfyui.sh
-```
-
-然后打开 ComfyUI，加载：
-
-```text
-ComfyUI/user/default/workflows/image_flux2_fp8.json
-```
-
-确认单张图能跑通后，导出 API 格式 workflow，放到本项目 `workflows/` 下。后端只要求 workflow 是 ComfyUI `/prompt` 接口能接受的 API JSON。
+为避免占用磁盘，当前项目未保留 Flux/Qwen/Z-Image 权重。后续如果宿主机驱动升级到可支持 CUDA 12 + PyTorch 2.x，再单独启用现代模型路线。
 
 ## 4.2 旧驱动兼容模式：能生图的 SD1.5 路线
 
@@ -204,9 +171,30 @@ cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
 
 已知限制：
 
-- `flux_schnell` FP8 在旧 torch 下无法加载，错误为缺少 `torch.float8_e4m3fn`。
+- `flux_schnell` FP8 在旧 torch 下无法加载，错误为缺少 `torch.float8_e4m3fn`，因此默认风格中已移除。
 - 最新 ComfyUI 在旧 torch 下无法启动，错误为缺少 `torch.library.custom_op`。
 - 因此旧驱动下的可落地路线是 SD1.5/部分旧 SDXL 工作流，不是 Flux/Flux2。
+
+## 4.3 SDXL 高质量兼容路线
+
+旧驱动下也可以尝试 SDXL base，质量通常明显高于 SD1.5，但速度更慢、显存占用更高：
+
+```bash
+cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
+./scripts/download_sdxl_base.sh
+```
+
+后端使用：
+
+```json
+{"style_id":"sdxl_base"}
+```
+
+模型位置：
+
+```text
+ComfyUI/models/checkpoints/sd_xl_base_1.0.safetensors
+```
 
 后端 `.env`：
 
