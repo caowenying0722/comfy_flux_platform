@@ -15,6 +15,7 @@ cp "$PROJECT_DIR/workflows/sdxl_base_img2img_ui.json" "$TARGET_DIR/sdxl_base_img
 cp "$PROJECT_DIR/workflows/sdxl_base_img2img_ui_blank.json" "$TARGET_DIR/sdxl_base_img2img_ui_blank.json"
 cp "$PROJECT_DIR/workflows/pixar_controlnet_img2img_ui.json" "$TARGET_DIR/pixar_controlnet_img2img_ui.json"
 cp "$PROJECT_DIR/workflows/pixar_controlnet_video_ui.json" "$TARGET_DIR/pixar_controlnet_video_ui.json"
+cp "$PROJECT_DIR/workflows/pixar_character_motion_ui.json" "$TARGET_DIR/pixar_character_motion_ui.json"
 cp "$PROJECT_DIR/workflows/six_style_variants_ui.json" "$TARGET_DIR/six_style_variants_ui.json"
 
 echo "Installed workflows:"
@@ -27,4 +28,5 @@ ls -lh \
   "$TARGET_DIR"/sdxl_base_img2img_ui_blank.json \
   "$TARGET_DIR"/pixar_controlnet_img2img_ui.json \
   "$TARGET_DIR"/pixar_controlnet_video_ui.json \
+  "$TARGET_DIR"/pixar_character_motion_ui.json \
   "$TARGET_DIR"/six_style_variants_ui.json

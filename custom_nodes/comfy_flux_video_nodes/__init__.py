@@ -120,10 +120,93 @@ class KenBurnsGIF:
         return Image.alpha_composite(frame.convert("RGBA"), overlay).convert("RGB")
 
 
+class ImageSequenceGIF:
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image_1": ("IMAGE",),
+                "image_2": ("IMAGE",),
+                "image_3": ("IMAGE",),
+                "image_4": ("IMAGE",),
+                "filename_prefix": ("STRING", {"default": "comfy_flux_platform/video_ui/character_motion"}),
+                "frame_duration_ms": ("INT", {"default": 500, "min": 120, "max": 2000, "step": 20}),
+                "ping_pong": ("BOOLEAN", {"default": True}),
+                "width": ("INT", {"default": 768, "min": 256, "max": 1920, "step": 16}),
+                "height": ("INT", {"default": 512, "min": 256, "max": 1080, "step": 16}),
+            }
+        }
+
+    RETURN_TYPES = ()
+    FUNCTION = "save"
+    OUTPUT_NODE = True
+    CATEGORY = "Comfy Flux Platform/video"
+
+    def save(self, image_1, image_2, image_3, image_4, filename_prefix, frame_duration_ms, ping_pong, width, height):
+        output_dir = Path(folder_paths.get_output_directory())
+        subfolder = Path(filename_prefix).parent.as_posix()
+        prefix = Path(filename_prefix).name
+        target_dir = output_dir / subfolder
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        counter = 1
+        while True:
+            filename = f"{prefix}_{counter:05}.gif"
+            output_path = target_dir / filename
+            if not output_path.exists():
+                break
+            counter += 1
+
+        frames = [
+            self._cover(self._tensor_to_pil(image_1[0]), width, height),
+            self._cover(self._tensor_to_pil(image_2[0]), width, height),
+            self._cover(self._tensor_to_pil(image_3[0]), width, height),
+            self._cover(self._tensor_to_pil(image_4[0]), width, height),
+        ]
+        if ping_pong:
+            frames = frames + frames[-2:0:-1]
+
+        frames[0].save(
+            output_path,
+            save_all=True,
+            append_images=frames[1:],
+            duration=frame_duration_ms,
+            loop=0,
+            optimize=True,
+        )
+
+        return {
+            "ui": {
+                "images": [
+                    {
+                        "filename": filename,
+                        "subfolder": subfolder,
+                        "type": "output",
+                    }
+                ]
+            }
+        }
+
+    def _tensor_to_pil(self, image_tensor: torch.Tensor) -> Image.Image:
+        array = image_tensor.detach().cpu().numpy()
+        array = np.clip(array * 255.0, 0, 255).astype(np.uint8)
+        return Image.fromarray(array).convert("RGB")
+
+    def _cover(self, source: Image.Image, width: int, height: int) -> Image.Image:
+        src_w, src_h = source.size
+        scale = max(width / src_w, height / src_h)
+        resized = source.resize((int(src_w * scale), int(src_h * scale)), Image.Resampling.LANCZOS)
+        left = (resized.width - width) // 2
+        top = (resized.height - height) // 2
+        return resized.crop((left, top, left + width, top + height))
+
+
 NODE_CLASS_MAPPINGS = {
     "KenBurnsGIF": KenBurnsGIF,
+    "ImageSequenceGIF": ImageSequenceGIF,
 }
 
 NODE_DISPLAY_NAME_MAPPINGS = {
     "KenBurnsGIF": "Ken Burns GIF",
+    "ImageSequenceGIF": "Image Sequence GIF",
 }

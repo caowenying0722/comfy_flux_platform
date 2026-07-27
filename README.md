@@ -348,6 +348,59 @@ pan_right
 ComfyUI/output/comfy_flux_platform/video_ui/
 ```
 
+### ComfyUI 稳定版：ControlNet + 低 denoise 关键帧
+
+如果想让人物、人数、背景尽量稳定，同时有轻微表情/视线变化，加载：
+
+```text
+ComfyUI/user/default/workflows/pixar_character_motion_ui.json
+```
+
+这个 UI workflow 是可编辑节点图，默认链路：
+
+```text
+LoadImage
+→ ImageScale 768x512
+→ Canny
+→ ControlNet + DreamShaperXL
+→ 4 条低 denoise 关键帧分支
+→ ImageSequenceGIF
+```
+
+默认 4 个关键帧：
+
+```text
+1_neutral          原始稳定表情
+2_gentle_smile     轻微微笑
+3_soft_blink       轻微眨眼
+4_slight_look      轻微转头/视线变化
+```
+
+默认参数偏稳定：
+
+```text
+ControlNet strength: 0.9
+denoise: 0.38
+steps: 8
+cfg: 2.0
+size: 768x512
+GIF frame_duration_ms: 500
+ping_pong: true
+```
+
+输出位置：
+
+```text
+ComfyUI/output/comfy_flux_platform/video_ui/character_motion_*.gif
+ComfyUI/output/comfy_flux_platform/character_motion/
+```
+
+调参原则：
+
+- 如果只是“在动”但动作太小，把 4 个 `KSampler` 的 `denoise` 提到 `0.45-0.52`。
+- 如果人物、人数或背景开始漂移，把 `denoise` 降到 `0.30-0.36`，或把 ControlNet strength 保持在 `0.9-1.0`。
+- 如果皮克斯风格不够明显，优先改 4 个正向提示词，不要先大幅提高 denoise。
+
 ## 4. ComfyUI 独立部署
 
 建议把 ComfyUI 放在本项目内，避免污染其他项目：
