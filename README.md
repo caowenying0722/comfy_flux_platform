@@ -116,6 +116,66 @@ curl -X POST http://127.0.0.1:8000/generate/batch \
 
 返回的是多个任务 ID。每个任务仍使用 `/task/{task_id}` 查询。后端会串行处理任务，避免多张图同时占满显存。
 
+### 一张图自动生成 6 宫格风格对比
+
+上传一张图后，可以自动生成 6 个风格，并在全部完成后拼成 2×3 对比宫格：
+
+```bash
+curl -X POST http://127.0.0.1:8000/generate/variants \
+  -H "Content-Type: application/json" \
+  -d '{"image_id":"替换为上传返回ID"}'
+```
+
+默认 6 个风格：
+
+```text
+pixar_controlnet
+dreamshaper_pixar
+anime
+figurine3d
+guofeng
+oilpainting
+```
+
+返回：
+
+```json
+{
+  "id": "variant-id",
+  "status": "pending",
+  "tasks": [
+    {"style_id": "pixar_controlnet", "task_id": "task-id"}
+  ],
+  "grid_url": null
+}
+```
+
+轮询宫格状态：
+
+```bash
+curl http://127.0.0.1:8000/variants/variant-id
+```
+
+完成后返回：
+
+```json
+{
+  "status": "completed",
+  "grid_url": "/files/variant_grids/variant-id.jpg"
+}
+```
+
+也可以指定自己的 6 个风格：
+
+```bash
+curl -X POST http://127.0.0.1:8000/generate/variants \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_id": "替换为上传返回ID",
+    "style_ids": ["pixar_controlnet", "dreamshaper_pixar", "anime", "figurine3d", "guofeng", "oilpainting"]
+  }'
+```
+
 ### 查询任务
 
 ```bash

@@ -39,6 +39,26 @@ class BatchGenerateResponse(BaseModel):
     tasks: list[BatchGenerateItem]
 
 
+class VariantGridRequest(BaseModel):
+    image_id: str
+    style_ids: list[str] | None = Field(default=None, min_length=6, max_length=6)
+
+
+class VariantGridTask(BaseModel):
+    style_id: str
+    style_name: str
+    task_id: str
+
+
+class VariantGridResponse(BaseModel):
+    id: str
+    status: str
+    image_id: str
+    tasks: list[VariantGridTask]
+    grid_url: str | None = None
+    error: str | None = None
+
+
 class TaskImage(BaseModel):
     item_id: str
     seed: int

@@ -14,16 +14,21 @@ from backend.schemas import (
     TaskImage,
     TaskResponse,
     UploadResponse,
+    VariantGridRequest,
+    VariantGridResponse,
+    VariantGridTask,
 )
 from backend.services.prompt_service import PromptService
 from backend.services.storage import StorageService
 from backend.services.task_service import TaskService
+from backend.services.variant_service import VariantService
 
 
 router = APIRouter()
 storage = StorageService()
 prompt_service = PromptService()
 task_service = TaskService()
+variant_service = VariantService(task_service=task_service)
 
 
 @router.post("/upload", response_model=UploadResponse)
@@ -75,6 +80,34 @@ def generate_batch(req: BatchGenerateRequest, db: Session = Depends(get_db)):
             raise HTTPException(status_code=404, detail=f"{image_id}: {exc}") from exc
         tasks.append(BatchGenerateItem(image_id=image_id, task_id=task.id, status=task.status))
     return BatchGenerateResponse(tasks=tasks)
+
+
+def _variant_response(payload: dict) -> VariantGridResponse:
+    return VariantGridResponse(
+        id=payload["id"],
+        status=payload["status"],
+        image_id=payload["image_id"],
+        tasks=[VariantGridTask(**item) for item in payload["tasks"]],
+        grid_url=storage.public_url_for_path(payload.get("grid_path")),
+        error=payload.get("error"),
+    )
+
+
+@router.post("/generate/variants", response_model=VariantGridResponse)
+def generate_variants(req: VariantGridRequest, db: Session = Depends(get_db)):
+    try:
+        payload = variant_service.create_variant_grid(db, image_id=req.image_id, style_ids=req.style_ids)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return _variant_response(payload)
+
+
+@router.get("/variants/{variant_id}", response_model=VariantGridResponse)
+def get_variant_grid(variant_id: str, db: Session = Depends(get_db)):
+    payload = variant_service.get_variant_grid(db, variant_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail="variant grid not found")
+    return _variant_response(payload)
 
 
 @router.get("/task/{task_id}", response_model=TaskResponse)

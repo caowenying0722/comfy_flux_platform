@@ -42,7 +42,11 @@ def index():
         "health": "/health",
         "apis": {
             "upload": "POST /upload",
+            "upload_batch": "POST /upload/batch",
             "generate": "POST /generate",
+            "generate_batch": "POST /generate/batch",
+            "generate_variants": "POST /generate/variants",
+            "variant": "GET /variants/{id}",
             "task": "GET /task/{id}",
             "styles": "GET /styles",
             "files": "GET /files/{path}",
