@@ -176,6 +176,42 @@ curl -X POST http://127.0.0.1:8000/generate/variants \
   }'
 ```
 
+ComfyUI 页面可编辑版本：
+
+```text
+ComfyUI/user/default/workflows/six_style_variants_ui.json
+```
+
+这个 UI workflow 会把同一张输入图分成 6 条风格分支：
+
+```text
+Pixar ControlNet
+DreamShaper Pixar
+Anime Comic
+3D Figurine
+Guofeng Art
+Oil Painting
+```
+
+每条分支都可以单独编辑：
+
+```text
+Positive Prompt
+Negative Prompt
+ControlNet strength
+KSampler denoise
+```
+
+它使用共享模型和共享控制图：
+
+```text
+Checkpoint: DreamShaperXL_Lightning.safetensors
+ControlNet: controlnet-canny-sdxl-1.0-small.safetensors
+Input size: 1152x768
+```
+
+注意：这个 UI workflow 会一次排队 6 条分支，显存和时间开销比单张大。如果只想快速试一个风格，用 `pixar_controlnet_img2img_ui.json`。
+
 ### 查询任务
 
 ```bash
