@@ -23,6 +23,36 @@ class GenerateResponse(BaseModel):
     status: str
 
 
+class EcommerceGenerateRequest(BaseModel):
+    image_id: str
+    template_id: str = Field(default="commercial_photo")
+    industry: str = Field(default="general")
+    brand_tone: str = Field(default="premium")
+    count: int = Field(default=6, ge=1, le=20)
+    extra_prompt: str = Field(default="", max_length=1000)
+
+
+class EcommerceGenerateResponse(BaseModel):
+    task_id: str
+    status: str
+    style_id: str
+    prompt: str
+    negative_prompt: str
+    workflow_json: str
+
+
+class EcommerceOption(BaseModel):
+    id: str
+    name: str
+    description: str = ""
+
+
+class EcommerceOptionsResponse(BaseModel):
+    templates: list[EcommerceOption]
+    industries: list[EcommerceOption]
+    brand_tones: list[EcommerceOption]
+
+
 class BatchGenerateRequest(BaseModel):
     image_ids: list[str] = Field(min_length=1, max_length=20)
     style_id: str

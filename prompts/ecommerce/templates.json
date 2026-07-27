@@ -1,0 +1,51 @@
+{
+  "clean_white_bg": {
+    "name": "电商白底主图",
+    "description": "适合商品主图，优先保持商品形状和颜色。",
+    "workflow_json": "ecommerce_sdxl_controlnet_img2img.json",
+    "prompt": "clean pure white background, professional ecommerce product photography, centered product, soft natural shadow, sharp focus, realistic product texture, high-end catalog image, clean composition",
+    "negative_prompt": "extra objects, props, messy background, colored background, text, watermark, logo artifacts, distorted product, changed product shape, changed product color, duplicate product, cropped product, low quality, blurry"
+  },
+  "commercial_photo": {
+    "name": "商业摄影主图",
+    "description": "适合广告主图、详情页首屏，强化光影和质感。",
+    "workflow_json": "ecommerce_dreamshaper_controlnet_img2img.json",
+    "prompt": "premium commercial product photography, luxury studio lighting, elegant clean background, soft reflections, realistic material texture, high-end advertising photo, professional product shot, hero product composition",
+    "negative_prompt": "low quality, blurry, cluttered background, distorted product, changed product shape, duplicate product, text, watermark, logo artifacts, bad perspective"
+  },
+  "lifestyle_scene": {
+    "name": "生活方式场景图",
+    "description": "适合详情页、种草图，让商品进入真实生活场景。",
+    "workflow_json": "ecommerce_dreamshaper_controlnet_img2img.json",
+    "prompt": "lifestyle product photography, product placed naturally in a beautiful real-life scene, warm natural light, premium composition, realistic environment, editorial style, tasteful props, commercial lifestyle image",
+    "negative_prompt": "low quality, blurry, unrealistic scene, too many objects, duplicate product, distorted product, changed product shape, text, watermark, logo artifacts, messy composition"
+  },
+  "xiaohongshu_style": {
+    "name": "小红书种草风",
+    "description": "适合社媒种草、内容电商封面。",
+    "workflow_json": "ecommerce_dreamshaper_controlnet_img2img.json",
+    "prompt": "xiaohongshu style lifestyle product photo, clean aesthetic, warm sunlight, cozy scene, trendy composition, soft colors, premium daily life atmosphere, social media product photography",
+    "negative_prompt": "low quality, blurry, harsh lighting, cluttered scene, duplicate product, distorted product, changed product shape, text, watermark, logo artifacts"
+  },
+  "ad_poster_bg": {
+    "name": "广告海报背景图",
+    "description": "适合后期叠加文案，不要求模型直接生成文字。",
+    "workflow_json": "ecommerce_dreamshaper_controlnet_img2img.json",
+    "prompt": "advertising poster visual, premium brand campaign, dramatic but clean lighting, product hero shot, spacious background for copywriting, high-end commercial design, elegant composition",
+    "negative_prompt": "generated text, unreadable text, watermark, logo artifacts, low quality, blurry, cluttered layout, duplicate product, distorted product, changed product shape"
+  },
+  "retail_display": {
+    "name": "门店陈列图",
+    "description": "适合招商材料、门店陈列、品牌展示页。",
+    "workflow_json": "ecommerce_dreamshaper_controlnet_img2img.json",
+    "prompt": "premium retail display scene, product displayed in luxury store shelf, modern boutique interior, professional lighting, brand showroom, commercial retail atmosphere, elegant product display",
+    "negative_prompt": "low quality, blurry, messy shelf, too many products, distorted product, changed product shape, wrong perspective, text, watermark, logo artifacts"
+  },
+  "franchise_visual": {
+    "name": "招商加盟视觉",
+    "description": "适合招商海报、加盟手册、品牌招商页。",
+    "workflow_json": "ecommerce_dreamshaper_controlnet_img2img.json",
+    "prompt": "business franchise advertising visual, premium brand store, modern retail space, product display wall, successful business atmosphere, professional investment promotion poster background, high-end brand image",
+    "negative_prompt": "low quality, blurry, messy retail space, unrealistic business scene, duplicate product, distorted product, changed product shape, generated text, watermark, logo artifacts"
+  }
+}

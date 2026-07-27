@@ -1,0 +1,22 @@
+{
+  "premium": {
+    "name": "高级",
+    "prompt": "premium, elegant, high-end, refined, tasteful"
+  },
+  "minimal": {
+    "name": "极简",
+    "prompt": "minimalist, clean, simple, pure, uncluttered"
+  },
+  "luxury": {
+    "name": "奢华",
+    "prompt": "luxury, sophisticated, expensive, glossy, exclusive"
+  },
+  "young": {
+    "name": "年轻",
+    "prompt": "youthful, trendy, vibrant, social media style, energetic"
+  },
+  "natural": {
+    "name": "自然",
+    "prompt": "natural, warm, organic, soft daylight, comfortable"
+  }
+}

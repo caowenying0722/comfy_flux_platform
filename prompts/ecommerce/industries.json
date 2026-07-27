@@ -1,0 +1,26 @@
+{
+  "skincare": {
+    "name": "美妆护肤",
+    "prompt": "skincare product, cosmetic bottle or jar, clean beauty, spa atmosphere, fresh and premium"
+  },
+  "food": {
+    "name": "食品饮料",
+    "prompt": "food or beverage product, appetizing scene, fresh ingredients, kitchen or dining table, delicious and clean"
+  },
+  "home": {
+    "name": "家居用品",
+    "prompt": "home goods product, modern interior, cozy home atmosphere, practical and tasteful"
+  },
+  "electronics": {
+    "name": "数码电子",
+    "prompt": "consumer electronics product, tech desk setup, futuristic clean lighting, modern and precise"
+  },
+  "fashion": {
+    "name": "服饰配件",
+    "prompt": "fashion accessory product, stylish editorial scene, premium lifestyle, refined materials"
+  },
+  "general": {
+    "name": "通用商品",
+    "prompt": "consumer product, commercial product photography, clean premium presentation"
+  }
+}

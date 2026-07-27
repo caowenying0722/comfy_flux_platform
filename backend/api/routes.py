@@ -8,6 +8,9 @@ from backend.schemas import (
     BatchGenerateRequest,
     BatchGenerateResponse,
     BatchUploadResponse,
+    EcommerceGenerateRequest,
+    EcommerceGenerateResponse,
+    EcommerceOptionsResponse,
     GenerateRequest,
     GenerateResponse,
     StyleResponse,
@@ -22,6 +25,7 @@ from backend.schemas import (
     VideoStyleRequest,
 )
 from backend.services.prompt_service import PromptService
+from backend.services.ecommerce_generation_service import EcommerceGenerationService
 from backend.services.storage import StorageService
 from backend.services.task_service import TaskService
 from backend.services.variant_service import VariantService
@@ -34,6 +38,7 @@ prompt_service = PromptService()
 task_service = TaskService()
 variant_service = VariantService(task_service=task_service)
 video_service = VideoService(task_service=task_service)
+ecommerce_service = EcommerceGenerationService(task_service=task_service)
 
 
 @router.post("/upload", response_model=UploadResponse)
@@ -73,6 +78,35 @@ def generate(req: GenerateRequest, db: Session = Depends(get_db)):
     except ValueError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
     return GenerateResponse(task_id=task.id, status=task.status)
+
+
+@router.get("/ecommerce/options", response_model=EcommerceOptionsResponse)
+def ecommerce_options():
+    return EcommerceOptionsResponse(**ecommerce_service.options())
+
+
+@router.post("/generate/ecommerce", response_model=EcommerceGenerateResponse)
+def generate_ecommerce(req: EcommerceGenerateRequest, db: Session = Depends(get_db)):
+    try:
+        task, composed = ecommerce_service.create_generation(
+            db,
+            image_id=req.image_id,
+            template_id=req.template_id,
+            industry=req.industry,
+            brand_tone=req.brand_tone,
+            count=req.count,
+            extra_prompt=req.extra_prompt,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return EcommerceGenerateResponse(
+        task_id=task.id,
+        status=task.status,
+        style_id=task.style_id,
+        prompt=composed.prompt,
+        negative_prompt=composed.negative_prompt,
+        workflow_json=composed.workflow_json,
+    )
 
 
 @router.post("/generate/batch", response_model=BatchGenerateResponse)

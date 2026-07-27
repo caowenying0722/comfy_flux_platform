@@ -577,6 +577,95 @@ denoise: 0.58
 
 如果背景变化仍明显，降低 `denoise` 到 `0.45-0.52`，或把 `controlnet strength` 提高到 `0.85-1.0`。如果皮克斯风格不够强，提高 `denoise` 到 `0.65-0.70`，但人物一致性会下降。
 
+## 4.6 电商/招商商品图批量生成 MVP
+
+当前推荐专注生图时使用这条路线：
+
+```text
+上传商品图
+→ 选择用途/行业/品牌调性
+→ 后端组合 Prompt
+→ 调用 SDXL/DreamShaperXL + Canny ControlNet
+→ 批量生成商品广告图
+```
+
+新增接口：
+
+```text
+GET  /ecommerce/options
+POST /generate/ecommerce
+GET  /task/{task_id}
+```
+
+查看可选模板：
+
+```bash
+curl http://127.0.0.1:8000/ecommerce/options
+```
+
+生成示例：
+
+```bash
+curl -X POST http://127.0.0.1:8000/generate/ecommerce \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_id": "替换为上传返回ID",
+    "template_id": "commercial_photo",
+    "industry": "skincare",
+    "brand_tone": "premium",
+    "count": 6
+  }'
+```
+
+支持的模板：
+
+```text
+clean_white_bg       电商白底主图
+commercial_photo     商业摄影主图
+lifestyle_scene      生活方式场景图
+xiaohongshu_style    小红书种草风
+ad_poster_bg         广告海报背景图
+retail_display       门店陈列图
+franchise_visual     招商加盟视觉
+```
+
+支持的行业：
+
+```text
+skincare      美妆护肤
+food          食品饮料
+home          家居用品
+electronics   数码电子
+fashion       服饰配件
+general       通用商品
+```
+
+支持的品牌调性：
+
+```text
+premium  高级
+minimal  极简
+luxury   奢华
+young    年轻
+natural  自然
+```
+
+模型路由：
+
+```text
+白底主图：SDXL Base + Canny ControlNet
+其他商业/场景/招商图：DreamShaperXL + Canny ControlNet
+```
+
+对应工作流：
+
+```text
+workflows/ecommerce_sdxl_controlnet_img2img.json
+workflows/ecommerce_dreamshaper_controlnet_img2img.json
+```
+
+注意：商品包装上的小字、复杂 logo 和标签文字不建议依赖模型重绘。白底主图建议低 denoise、高 ControlNet；广告图和场景图可以允许更强风格化。
+
 后端 `.env`：
 
 ```env
