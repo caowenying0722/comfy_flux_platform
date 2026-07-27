@@ -17,11 +17,15 @@ from backend.schemas import (
     VariantGridRequest,
     VariantGridResponse,
     VariantGridTask,
+    VideoKenBurnsRequest,
+    VideoResponse,
+    VideoStyleRequest,
 )
 from backend.services.prompt_service import PromptService
 from backend.services.storage import StorageService
 from backend.services.task_service import TaskService
 from backend.services.variant_service import VariantService
+from backend.services.video_service import VideoService
 
 
 router = APIRouter()
@@ -29,6 +33,7 @@ storage = StorageService()
 prompt_service = PromptService()
 task_service = TaskService()
 variant_service = VariantService(task_service=task_service)
+video_service = VideoService(task_service=task_service)
 
 
 @router.post("/upload", response_model=UploadResponse)
@@ -108,6 +113,62 @@ def get_variant_grid(variant_id: str, db: Session = Depends(get_db)):
     if not payload:
         raise HTTPException(status_code=404, detail="variant grid not found")
     return _variant_response(payload)
+
+
+def _video_response(payload: dict) -> VideoResponse:
+    return VideoResponse(
+        id=payload["id"],
+        status=payload["status"],
+        kind=payload["kind"],
+        image_id=payload["image_id"],
+        style_id=payload.get("style_id"),
+        generation_task_id=payload.get("generation_task_id"),
+        video_url=storage.public_url_for_path(payload.get("video_path")),
+        error=payload.get("error"),
+    )
+
+
+@router.post("/video/kenburns", response_model=VideoResponse)
+def create_kenburns_video(req: VideoKenBurnsRequest, db: Session = Depends(get_db)):
+    try:
+        payload = video_service.create_kenburns_video(
+            db,
+            image_id=req.image_id,
+            duration=req.duration,
+            fps=req.fps,
+            width=req.width,
+            height=req.height,
+            motion=req.motion,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return _video_response(payload)
+
+
+@router.post("/video/style", response_model=VideoResponse)
+def create_styled_video(req: VideoStyleRequest, db: Session = Depends(get_db)):
+    try:
+        payload = video_service.create_styled_video(
+            db,
+            image_id=req.image_id,
+            style_id=req.style_id,
+            duration=req.duration,
+            fps=req.fps,
+            width=req.width,
+            height=req.height,
+            motion=req.motion,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+    return _video_response(payload)
+
+
+@router.get("/video/{video_id}", response_model=VideoResponse)
+def get_video(video_id: str, db: Session = Depends(get_db)):
+    payload = video_service.get_video(db, video_id)
+    if not payload:
+        raise HTTPException(status_code=404, detail="video not found")
+    return _video_response(payload)
 
 
 @router.get("/task/{task_id}", response_model=TaskResponse)

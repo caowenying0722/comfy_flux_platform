@@ -59,6 +59,30 @@ class VariantGridResponse(BaseModel):
     error: str | None = None
 
 
+class VideoKenBurnsRequest(BaseModel):
+    image_id: str
+    duration: float = Field(default=4.0, ge=1.0, le=15.0)
+    fps: int = Field(default=24, ge=8, le=30)
+    width: int = Field(default=1152, ge=256, le=1920)
+    height: int = Field(default=768, ge=256, le=1080)
+    motion: str = Field(default="slow_zoom_in")
+
+
+class VideoStyleRequest(VideoKenBurnsRequest):
+    style_id: str = "pixar_controlnet"
+
+
+class VideoResponse(BaseModel):
+    id: str
+    status: str
+    kind: str
+    image_id: str
+    style_id: str | None = None
+    generation_task_id: str | None = None
+    video_url: str | None = None
+    error: str | None = None
+
+
 class TaskImage(BaseModel):
     item_id: str
     seed: int

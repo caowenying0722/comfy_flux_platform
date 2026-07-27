@@ -235,6 +235,67 @@ curl http://127.0.0.1:8000/task/任务ID
 curl -O http://127.0.0.1:8000/files/generated_images/xxx.png
 ```
 
+## 3.1 视频 MVP：Ken Burns 动效
+
+当前视频 MVP 不依赖视频大模型，使用后端 Pillow 生成轻量动效 GIF。这样可以在当前旧驱动环境稳定运行。
+
+### 原图直接生成动效
+
+```bash
+curl -X POST http://127.0.0.1:8000/video/kenburns \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_id": "替换为上传返回ID",
+    "duration": 4,
+    "fps": 12,
+    "width": 1152,
+    "height": 768,
+    "motion": "slow_zoom_in"
+  }'
+```
+
+支持的 `motion`：
+
+```text
+slow_zoom_in
+slow_zoom_out
+pan_left
+pan_right
+```
+
+### 先生成风格图，再生成动效
+
+```bash
+curl -X POST http://127.0.0.1:8000/video/style \
+  -H "Content-Type: application/json" \
+  -d '{
+    "image_id": "替换为上传返回ID",
+    "style_id": "pixar_controlnet",
+    "duration": 4,
+    "fps": 12,
+    "width": 1152,
+    "height": 768,
+    "motion": "slow_zoom_in"
+  }'
+```
+
+查询视频任务：
+
+```bash
+curl http://127.0.0.1:8000/video/视频ID
+```
+
+完成后返回：
+
+```json
+{
+  "status": "completed",
+  "video_url": "/files/videos/xxx.gif"
+}
+```
+
+说明：当前输出是 GIF，不是 MP4。原因是当前容器没有系统 `ffmpeg`，后端 `.venv` 是 Python 3.14，部分视频编码依赖没有稳定 wheel。后续如果切后端到 Python 3.10 或安装系统 ffmpeg，可以升级为 MP4 输出。
+
 ## 4. ComfyUI 独立部署
 
 建议把 ComfyUI 放在本项目内，避免污染其他项目：

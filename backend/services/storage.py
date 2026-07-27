@@ -13,9 +13,11 @@ class StorageService:
         self.original_dir = self.root / "original_images"
         self.generated_dir = self.root / "generated_images"
         self.variant_dir = self.root / "variant_grids"
+        self.video_dir = self.root / "videos"
         self.original_dir.mkdir(parents=True, exist_ok=True)
         self.generated_dir.mkdir(parents=True, exist_ok=True)
         self.variant_dir.mkdir(parents=True, exist_ok=True)
+        self.video_dir.mkdir(parents=True, exist_ok=True)
 
     async def save_upload(self, file: UploadFile) -> tuple[str, Path]:
         image_id = str(uuid4())
@@ -34,6 +36,12 @@ class StorageService:
 
     def variant_grid_path(self, variant_id: str) -> Path:
         return self.variant_dir / f"{variant_id}.jpg"
+
+    def video_manifest_path(self, video_id: str) -> Path:
+        return self.video_dir / f"{video_id}.json"
+
+    def video_path(self, video_id: str, suffix: str = ".mp4") -> Path:
+        return self.video_dir / f"{video_id}{suffix}"
 
     def public_url_for_path(self, path: str | None) -> str | None:
         if not path:
