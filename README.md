@@ -296,6 +296,58 @@ curl http://127.0.0.1:8000/video/视频ID
 
 说明：当前输出是 GIF，不是 MP4。原因是当前容器没有系统 `ffmpeg`，后端 `.venv` 是 Python 3.14，部分视频编码依赖没有稳定 wheel。后续如果切后端到 Python 3.10 或安装系统 ffmpeg，可以升级为 MP4 输出。
 
+### ComfyUI 可编辑视频节点版
+
+如果想在 ComfyUI 页面里直接看到节点并调参，加载：
+
+```text
+ComfyUI/user/default/workflows/pixar_controlnet_video_ui.json
+```
+
+这个 workflow 包含完整链路：
+
+```text
+LoadImage
+→ ImageScale
+→ Canny
+→ ControlNet + DreamShaperXL 皮克斯风格生图
+→ VAEDecode
+→ SaveImage
+→ KenBurnsGIF
+```
+
+`KenBurnsGIF` 是本项目提供的自定义 ComfyUI 节点，位置：
+
+```text
+ComfyUI/custom_nodes/comfy_flux_video_nodes
+```
+
+可调参数：
+
+```text
+filename_prefix
+duration
+fps
+width
+height
+motion
+```
+
+支持的 `motion`：
+
+```text
+slow_zoom_in
+slow_zoom_out
+pan_left
+pan_right
+```
+
+生成的 GIF 会保存到：
+
+```text
+ComfyUI/output/comfy_flux_platform/video_ui/
+```
+
 ## 4. ComfyUI 独立部署
 
 建议把 ComfyUI 放在本项目内，避免污染其他项目：
