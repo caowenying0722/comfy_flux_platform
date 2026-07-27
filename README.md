@@ -401,6 +401,100 @@ ComfyUI/output/comfy_flux_platform/character_motion/
 - 如果人物、人数或背景开始漂移，把 `denoise` 降到 `0.30-0.36`，或把 ControlNet strength 保持在 `0.9-1.0`。
 - 如果皮克斯风格不够明显，优先改 4 个正向提示词，不要先大幅提高 denoise。
 
+### ComfyUI 视频模型版：AnimateDiff SD1.5
+
+如果不要关键帧拼接，而是要真正的视频模型工作流，使用 AnimateDiff：
+
+```bash
+cd /mnt/DATA1/zhangshanshan/workspace/comfy_flux_platform
+./scripts/install_animatediff_video.sh
+./scripts/install_workflows_to_comfyui.sh
+```
+
+当前固定版本：
+
+```text
+ComfyUI-AnimateDiff-Evolved: 13ed169
+motion module: ComfyUI/models/animatediff_models/mm_sd_v15_v2.ckpt
+base checkpoint: ComfyUI/models/checkpoints/v1-5-pruned-emaonly-fp16.safetensors
+```
+
+固定旧版 `13ed169` 的原因：最新版 AnimateDiff-Evolved 已迁移到 ComfyUI v3 API，当前 ComfyUI `0.3.20` 没有 `comfy_api.latest`，会导入失败。
+
+可编辑 UI workflow：
+
+```text
+ComfyUI/user/default/workflows/animatediff_sd15_txt2video_ui.json
+ComfyUI/user/default/workflows/animatediff_sd15_img2video_ui.json
+```
+
+推荐先跑文生视频版：
+
+```text
+animatediff_sd15_txt2video_ui.json
+```
+
+它的链路是：
+
+```text
+CheckpointLoaderSimple
+→ ADE_AnimateDiffLoaderGen1
+→ EmptyLatentImage(batch_size=16)
+→ KSampler
+→ VAEDecode
+→ ADE_AnimateDiffCombine
+```
+
+图生视频版：
+
+```text
+animatediff_sd15_img2video_ui.json
+```
+
+它的链路是：
+
+```text
+LoadImage
+→ ImageScale 512x512
+→ VAEEncode
+→ RepeatLatentBatch(16 frames)
+→ AnimateDiff + KSampler
+→ VAEDecode
+→ ADE_AnimateDiffCombine
+```
+
+默认输出：
+
+```text
+ComfyUI/output/comfy_flux_platform/animatediff/*.gif
+```
+
+默认参数偏保守：
+
+```text
+frames: 16
+fps: 8
+txt2video denoise: 1.0
+img2video denoise: 0.62
+steps: 20
+cfg: 7.0
+size: 512x512
+```
+
+调参建议：
+
+- 想要动作更明显：图生视频把 `KSampler denoise` 提到 `0.70-0.80`。
+- 想更像原图：图生视频把 `denoise` 降到 `0.45-0.58`。
+- 显存不足：先保持 `512x512 / 16 frames`，不要直接上 768 或 32 帧。
+- 当前输出是 GIF；如果需要 MP4，建议给容器安装 `ffmpeg` 后再接 VideoHelperSuite。
+
+当前环境验证结果：
+
+- ComfyUI `0.3.20` + PyTorch `1.12.1+cu113` 下，AnimateDiff-Evolved 最新版会因为缺少 `comfy_api.latest` 加载失败，所以固定到 `13ed169`。
+- 已补两个旧 PyTorch 兼容点：`torch.load(weights_only=True)` 和 `torch.nn.Sequential.insert()`。
+- 节点级校验通过，两个 workflow 的所有节点都能被 ComfyUI 识别。
+- API 冒烟测试能进入 AnimateDiff 采样，但在当前服务器负载/旧运行栈下超时，暂不能标记为实际生视频已跑通。若要稳定跑视频模型，建议下一步升级宿主机 NVIDIA 驱动后切到 PyTorch 2.x + 新版 ComfyUI，或者单独停掉其他占 GPU 的服务后再测低分辨率。
+
 ## 4. ComfyUI 独立部署
 
 建议把 ComfyUI 放在本项目内，避免污染其他项目：
